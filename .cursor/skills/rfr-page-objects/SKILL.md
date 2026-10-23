@@ -22,6 +22,8 @@ description: Создаёт и меняет Page Objects и компоненты
 10. Проверка не должна быть тавтологией локатора: `assertThat(heading("Travels map")).hasText("Travels map")` ничего не доказывает. Ожидаемое значение приходит из теста параметром метода (`checkThatUsername(username)`), а не литералом внутри Page Object.
 11. Вход только через UI. Токены (`access_token`/`id_token`) в `localStorage` не подставлять — даже если это ускорило бы тест. (до занятия 13).
 12. Без комментариев и Javadoc: смысл передают имена методов и текст `@Step`.
+13. MUI `Select` — это `combobox`. Option не ищи по составному accessible name вроде «France France»: кликни `combobox`, затем `getByRole(OPTION)` с фильтром `setHas(getByRole(IMG, name страны, exact))`. Имя страны — параметр из теста.
+14. Если сразу после клика тест делает `reload()` или уходит со страницы, клик обязан дождаться ответа сервера: `page.waitForResponse(..., button::click)`. Для профиля — POST `/graphql` с операцией `UpdateUser`. Это синхронизация действия, не `waitUntilLoaded` и не проверка в `checkThat…`.
 
 ## Частые ошибки   
 
@@ -33,7 +35,9 @@ description: Создаёт и меняет Page Objects и компоненты
 | `page.locator(".MuiButton-root").first().click()` | `page.getByTestId("submit").click()` или `page.getByRole(BUTTON, name("Войти")).click()` | Без MUI-классов, `first()`/`nth()` (п. 9) |
 | клик внутри `checkThat…` | только `assertThat(...)`, без кликов в проверках | Действие отдельно от проверки (п. 7) |
 | `class LoginPage extends BasePage` | `final class LoginPage` с полями-компонентами | Композиция вместо наследования (п. 3) |
-| `@Step("Fill login form: {username} / {password}")` | `@Step("Fill login form: {username}")` | Пароль не интерполируется в шаг — утечка в отчёт (п. 4) |   
+| `@Step("Fill login form: {username} / {password}")` | `@Step("Fill login form: {username}")` | Пароль не интерполируется в шаг — утечка в отчёт (п. 4) |
+| `getByRole(OPTION, name("France France"))` | `OPTION` + `setHas(IMG с точным именем страны)` | Accessible name option склеивает alt флага и текст (п. 13) |
+| `save.click(); page.reload();` | `waitForResponse(..., save::click)` затем `reload()` | Иначе reload обгоняет мутацию `UpdateUser` (п. 14) |
 
 ## Проверка результата
 

@@ -33,7 +33,7 @@ public final class ProfilePage {
     this.surnameInput = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Surname").setExact(true));
     this.usernameInput = page.getByRole(AriaRole.TEXTBOX, new Page.GetByRoleOptions().setName("Username").setExact(true));
     this.locationCombobox = page.getByRole(AriaRole.COMBOBOX, new Page.GetByRoleOptions().setName("Location").setExact(true));
-    this.avatarInput = page.locator("#image__input");
+    this.avatarInput = page.getByLabel("Update avatar", new Page.GetByLabelOptions().setExact(true));
     this.saveButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save").setExact(true));
     this.resetButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Reset").setExact(true));
   }
@@ -116,8 +116,8 @@ public final class ProfilePage {
 
   @Step("Check that avatar src starts with {srcPrefix}")
   public ProfilePage checkThatAvatar(String srcPrefix) {
-    assertThat(page.getByRole(AriaRole.MAIN).locator("img[alt='']"))
-        .hasAttribute("src", Pattern.compile("^" + Pattern.quote(srcPrefix) + ".*"));
+    assertThat(page.getByRole(AriaRole.MAIN).locator("img:not([alt])"))
+        .hasAttribute("src", Pattern.compile("^" + srcPrefix + ".*"));
     return this;
   }
 }

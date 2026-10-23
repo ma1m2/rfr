@@ -3,6 +3,7 @@ package io.student.rangiffler.jupiter.extension;
 import io.student.rangiffler.data.TestUser;
 import io.student.rangiffler.data.UserFixture;
 import io.student.rangiffler.jupiter.annotation.User;
+import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 
 import java.lang.reflect.Parameter;
 
-public final class UserExtension implements BeforeEachCallback, ParameterResolver {
+public final class UserExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
   private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(UserExtension.class);
 
   @Override
@@ -46,6 +47,20 @@ public final class UserExtension implements BeforeEachCallback, ParameterResolve
       );
     }
     return fixture.user();
+  }
+
+  @Override
+  public void afterEach(ExtensionContext context) {
+    Parameter[] parameters = context.getRequiredTestMethod().getParameters();
+    for (int index = 0; index < parameters.length; index++) {
+      if (!parameters[index].isAnnotationPresent(User.class)) {
+        continue;
+      }
+      UserFixture fixture = context.getStore(NAMESPACE).remove(key(index), UserFixture.class);
+      if (fixture != null) {
+        fixture.close();
+      }
+    }
   }
 
   private static String key(int index) {
