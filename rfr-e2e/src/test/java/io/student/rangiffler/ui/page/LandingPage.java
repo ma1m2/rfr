@@ -6,10 +6,9 @@ import com.microsoft.playwright.options.AriaRole;
 import io.qameta.allure.Step;
 import io.student.rangiffler.config.TestConfig;
 
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-import static io.student.rangiffler.config.TestConfig.frontUrl;
+public final class LandingPage {
 
-public class LandingPage {
+  public static final String URL = TestConfig.frontUrl();
 
   private final Page page;
   private final Locator loginButton;
@@ -17,19 +16,13 @@ public class LandingPage {
 
   public LandingPage(Page page) {
     this.page = page;
-    this.loginButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Login"));
-    this.registerLink = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Register"));
+    this.loginButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Login").setExact(true));
+    this.registerLink = page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Register").setExact(true));
   }
 
   @Step("Open landing page")
   public LandingPage open() {
-    page.navigate(frontUrl());
-    return waitOpened();
-  }
-
-  @Step("Wait until landing page is visible")
-  public LandingPage waitOpened() {
-    assertThat(loginButton).isVisible();
+    page.navigate(URL);
     return this;
   }
 

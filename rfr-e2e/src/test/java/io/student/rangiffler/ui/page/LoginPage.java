@@ -4,35 +4,26 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import io.qameta.allure.Step;
+import io.student.rangiffler.config.TestConfig;
+import io.student.rangiffler.ui.component.CredentialsForm;
 
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+public final class LoginPage {
 
-public class LoginPage {
+  public static final String URL = TestConfig.authUrl() + "/login";
 
   private final Page page;
-  private final Locator usernameInput;
-  private final Locator passwordInput;
+  private final CredentialsForm credentialsForm;
   private final Locator signInButton;
 
   public LoginPage(Page page) {
     this.page = page;
-    this.usernameInput = page.locator("input[name='username']");
-    this.passwordInput = page.locator("input[name='password']");
-    this.signInButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in"));
+    this.credentialsForm = new CredentialsForm(page);
+    this.signInButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in").setExact(true));
   }
 
-  @Step("Wait until login form is opened")
-  public LoginPage waitOpened() {
-    page.waitForURL("**/login**");
-    assertThat(usernameInput).isVisible();
-    return this;
-  }
-
-  @Step("Sign in as {username}")
-  public MyTravelsPage signIn(String username, String password) {
-    waitOpened();
-    usernameInput.fill(username);
-    passwordInput.fill(password);
+  @Step("Fill login form: {username}")
+  public MyTravelsPage fillLoginForm(String username, String password) {
+    credentialsForm.fillCredentials(username, password);
     signInButton.click();
     return new MyTravelsPage(page);
   }

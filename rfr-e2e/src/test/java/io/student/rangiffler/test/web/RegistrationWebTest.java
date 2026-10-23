@@ -9,9 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
-import static io.student.rangiffler.utils.RandomDataUtils.randomPassword;
 import static io.student.rangiffler.utils.RandomDataUtils.randomUsername;
 
 @Epic("Web")
@@ -29,12 +26,12 @@ class RegistrationWebTest extends BaseWebTest {
     new LandingPage(page)
         .open()
         .clickRegister()
-        .register(username, password)
-        .verifySuccess()
+        .fillRegistrationForm(username, password)
+        .checkThatSuccessMessage("Congratulations! You've registered!")
         .clickSignIn()
         .clickLogin()
-        .signIn(username, password)
+        .fillLoginForm(username, password)
         .openProfile()
-        .verifyUsername(username);
+        .checkThatUsername(username);
   }
 }
