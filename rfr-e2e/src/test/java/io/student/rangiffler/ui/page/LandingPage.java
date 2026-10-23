@@ -1,16 +1,15 @@
-package io.student.rangiffler.page;
+package io.student.rangiffler.ui.page;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import io.qameta.allure.Step;
-import io.student.rangiffler.config.Config;
+import io.student.rangiffler.config.TestConfig;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+import static io.student.rangiffler.config.TestConfig.frontUrl;
 
 public class LandingPage {
-
-  private static final Config CFG = Config.getInstance();
 
   private final Page page;
   private final Locator loginButton;
@@ -24,7 +23,7 @@ public class LandingPage {
 
   @Step("Open landing page")
   public LandingPage open() {
-    page.navigate(CFG.frontUrl());
+    page.navigate(frontUrl());
     return waitOpened();
   }
 
