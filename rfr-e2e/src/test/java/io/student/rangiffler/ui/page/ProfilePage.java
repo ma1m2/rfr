@@ -116,7 +116,7 @@ public final class ProfilePage {
 
   @Step("Check that avatar src starts with {srcPrefix}")
   public ProfilePage checkThatAvatar(String srcPrefix) {
-    assertThat(page.getByRole(AriaRole.MAIN).locator("img:not([alt])"))
+    assertThat(page.getByRole(AriaRole.MAIN).locator("img[src^='data:image/']"))
         .hasAttribute("src", Pattern.compile("^" + srcPrefix + ".*"));
     return this;
   }

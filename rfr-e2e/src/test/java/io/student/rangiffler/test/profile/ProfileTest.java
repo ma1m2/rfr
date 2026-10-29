@@ -80,6 +80,7 @@ class ProfileTest extends BaseWebTest {
         .open()
         .clickLogin()
         .fillLoginForm(user.username(), user.password())
+        .clickSignIn()
         .openProfile();
   }
 

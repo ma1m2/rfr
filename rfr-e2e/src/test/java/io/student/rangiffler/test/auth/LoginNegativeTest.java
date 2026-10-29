@@ -28,7 +28,8 @@ class LoginNegativeTest extends BaseWebTest {
     LoginPage loginPage = new LandingPage(page)
         .open()
         .clickLogin();
-    loginPage.fillLoginForm(user.username(), WRONG_PASSWORD);
+    loginPage.fillLoginForm(user.username(), WRONG_PASSWORD)
+        .clickSignIn();
     loginPage.checkThatErrorShown(BAD_CREDENTIALS);
   }
 
@@ -39,7 +40,8 @@ class LoginNegativeTest extends BaseWebTest {
     LoginPage loginPage = new LandingPage(page)
         .open()
         .clickLogin();
-    loginPage.fillLoginForm(unknown.username(), unknown.password());
+    loginPage.fillLoginForm(unknown.username(), unknown.password())
+        .clickSignIn();
     loginPage.checkThatErrorShown(BAD_CREDENTIALS);
   }
 }

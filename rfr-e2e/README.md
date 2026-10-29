@@ -50,4 +50,4 @@ E2E-тесты Rangiffler: JUnit 6.1.3, Playwright Java 1.63 (`@UsePlaywright`),
 
 ## Агент
 
-Page Objects пишет Claude Code по skill `rfr-page-objects`; UI исследуется через Playwright MCP (`.mcp.json`). Домашнее задание — `docs/lessons/01/homework/README.md`. Проход через MCP — не запуск теста: подтверждение только JUnit-прогоном.
+Page Objects пишет Cursor по skill `rfr-page-objects` (`.cursor/skills/rfr-page-objects/SKILL.md`); UI исследуется через Playwright MCP (`.mcp.json`). Домашнее задание — `docs/lessons/01/homework/README.md`. Проход через MCP — не запуск теста: подтверждение только JUnit-прогоном.

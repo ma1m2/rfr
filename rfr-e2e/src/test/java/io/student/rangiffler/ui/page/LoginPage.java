@@ -26,8 +26,13 @@ public final class LoginPage {
   }
 
   @Step("Fill login form: {username}")
-  public MyTravelsPage fillLoginForm(String username, String password) {
+  public LoginPage fillLoginForm(String username, String password) {
     credentialsForm.fillCredentials(username, password);
+    return this;
+  }
+
+  @Step("Click Sign in")
+  public MyTravelsPage clickSignIn() {
     signInButton.click();
     return new MyTravelsPage(page);
   }
