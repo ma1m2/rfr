@@ -12,6 +12,7 @@ jobs:
       api: ${{ steps.filter.outputs.api }}
       e2e: ${{ steps.filter.outputs.e2e }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      ci: ${{ steps.filter.outputs.ci }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -27,7 +28,6 @@ jobs:
               - 'gradle/**'
               - 'gradlew'
               - 'gradlew.bat'
-              - '.github/workflows/ci.yml'
             api:
               - 'rfr-api/**'
               - 'build.gradle'
@@ -35,7 +35,6 @@ jobs:
               - 'gradle/**'
               - 'gradlew'
               - 'gradlew.bat'
-              - '.github/workflows/ci.yml'
             e2e:
               - 'rfr-e2e/**'
               - 'build.gradle'
@@ -43,14 +42,14 @@ jobs:
               - 'gradle/**'
               - 'gradlew'
               - 'gradlew.bat'
-              - '.github/workflows/ci.yml'
             frontend:
               - 'rfr-gql-client/**'
+            ci:
               - '.github/workflows/ci.yml'
 
   backend:
     needs: changes
-    if: needs.changes.outputs.auth == 'true' || needs.changes.outputs.api == 'true'
+    if: needs.changes.outputs.auth == 'true' || needs.changes.outputs.api == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -63,15 +62,16 @@ jobs:
         env:
           BUILD_AUTH: ${{ needs.changes.outputs.auth }}
           BUILD_API: ${{ needs.changes.outputs.api }}
+          BUILD_CI: ${{ needs.changes.outputs.ci }}
         run: |
           tasks=()
-          if [ "$BUILD_AUTH" = true ]; then tasks+=(":rfr-auth:build"); fi
-          if [ "$BUILD_API" = true ]; then tasks+=(":rfr-api:build"); fi
+          if [ "$BUILD_AUTH" = true ] || [ "$BUILD_CI" = true ]; then tasks+=(":rfr-auth:build"); fi
+          if [ "$BUILD_API" = true ] || [ "$BUILD_CI" = true ]; then tasks+=(":rfr-api:build"); fi
           ./gradlew --no-daemon "${tasks[@]}" -x test
 
   e2e:
     needs: changes
-    if: needs.changes.outputs.e2e == 'true'
+    if: needs.changes.outputs.e2e == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -85,7 +85,7 @@ jobs:
 
   frontend:
     needs: changes
-    if: needs.changes.outputs.frontend == 'true'
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
