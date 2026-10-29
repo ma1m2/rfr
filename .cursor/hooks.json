@@ -1,6 +1,12 @@
 {
   "version": 1,
   "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "node .cursor/hooks/deny-destructive.mjs",
+        "failClosed": true
+      }
+    ],
     "postToolUse": [
       {
         "command": "node .cursor/hooks/compile-changed.mjs",

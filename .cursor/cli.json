@@ -10,19 +10,24 @@
       "Shell(docker:compose start mysql*)",
       "Shell(docker:compose stop mysql*)",
       "Shell(bash:localenv.sh*)",
+      "Shell(mv)",
       "Mcp(cursor-ide-browser:*)",
       "Mcp(playwright:*)",
       "Write(**/*.bak)"
     ],
     "deny": [
-      "Shell(git:push*)",
+      "Shell(git:*push*)",
+      "Shell(git:rm*)",
       "Shell(rm)",
+      "Shell(unlink)",
+      "Shell(find)",
       "Shell(del)",
       "Shell(erase)",
       "Shell(rmdir)",
       "Shell(rd)",
       "Shell(Remove-Item)",
-      "Shell(ri)"
+      "Shell(ri)",
+      "Shell(shred)"
     ]
   }
 }

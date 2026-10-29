@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process'
-import { relative } from 'node:path'
+import { join, relative } from 'node:path'
 import { stdin } from 'node:process'
 
 const input = JSON.parse(await new Response(stdin).text() || '{}')
@@ -8,23 +8,31 @@ const file = input.file_path || input.tool_input?.path || input.tool_input?.file
 const root = input.cwd || process.cwd()
 const rel = relative(root, file).replaceAll('\\', '/')
 const gw = process.platform === 'win32' ? '.\\gradlew.bat' : './gradlew'
-let label
-let cmd
+const opts = { encoding: 'utf8', shell: true, timeout: 170000, windowsHide: true }
+let parts
 if (rel.startsWith('rfr-auth/') && rel.endsWith('.java')) {
-  [label, cmd] = ['rfr-auth', `${gw} -q :rfr-auth:compileJava`]
+  parts = [run(`${gw} -q :rfr-auth:compileJava`, root, 'rfr-auth', rel)]
 } else if (rel.startsWith('rfr-api/') && rel.endsWith('.java')) {
-  [label, cmd] = ['rfr-api', `${gw} -q :rfr-api:compileJava`]
+  parts = [run(`${gw} -q :rfr-api:compileJava`, root, 'rfr-api', rel)]
 } else if (rel.startsWith('rfr-e2e/') && rel.endsWith('.java')) {
-  [label, cmd] = ['rfr-e2e', `${gw} -q :rfr-e2e:compileTestJava`]
+  parts = [run(`${gw} -q :rfr-e2e:compileTestJava`, root, 'rfr-e2e', rel)]
 } else if (rel.startsWith('rfr-gql-client/src/') && /\.tsx?$/.test(rel)) {
-  [label, cmd] = ['rfr-gql-client', 'npx --prefix rfr-gql-client tsc --noEmit -p rfr-gql-client']
+  const frontFile = rel.slice('rfr-gql-client/'.length)
+  const frontDir = join(root, 'rfr-gql-client')
+  parts = [
+    run('npx tsc --noEmit -p tsconfig.json', frontDir, 'rfr-gql-client tsc', rel),
+    run(`npx eslint ${JSON.stringify(frontFile)} --report-unused-disable-directives --max-warnings 0`, frontDir, 'rfr-gql-client eslint', rel)
+  ]
 } else {
   process.stdout.write('{}')
   process.exit(0)
 }
-const result = spawnSync(cmd, { cwd: root, encoding: 'utf8', shell: true, timeout: 170000, windowsHide: true })
-const log = [result.stdout, result.stderr].filter(Boolean).join('\n').trim()
-const msg = result.status === 0
-  ? `Compilation of ${label} passed after editing ${rel}`
-  : `Compilation of ${label} failed after editing ${rel}:\n${log}`
-process.stdout.write(JSON.stringify({ additional_context: msg }))
+process.stdout.write(JSON.stringify({ additional_context: parts.join('\n') }))
+
+function run(cmd, cwd, label, edited) {
+  const result = spawnSync(cmd, { ...opts, cwd })
+  const log = [result.stdout, result.stderr].filter(Boolean).join('\n').trim()
+  const status = result.status === 0 ? 'passed' : 'failed'
+  const head = `${label} ${status} after editing ${edited}`
+  return result.status === 0 ? head : `${head}:\n${log}`
+}

@@ -1,19 +1,7 @@
-## Конфигурация
+# rfr-e2e
 
+Page Objects — skill `rfr-page-objects`. Подробности — `README.md`.
 
-Настройки тестов — `TestConfig`: `-Drfr.<ключ>=…` или переменная `RFR_<КЛЮЧ>`, иначе значение по умолчанию. Подробности — `rfr-e2e/README.md`.
+Пакеты: `config`, `jupiter`, `data`, `api`, `ui`, `assertions`, `test`. Новые классы — в существующие пакеты.
 
-## Создание Page Pbfects
-
-Используй силл `rfr-page-objects` (`.cursor/skills/rfr-page-objects/SKILL.md`).  
-
-
-
-## Архитектура проекта
-
-- Структура пакетов — `rfr-e2e/README.md`, раздел «Архитектура»: `config`, `jupiter`, `data`, `api`, `ui`, `assertions`, `test`. Новые классы кладутся в существующие пакеты.
-- Page Objects и компоненты — по skill `rfr-page-objects` (`.claude/skills/rfr-page-objects/SKILL.md`).
-- Без комментариев и Javadoc в коде `rfr-e2e` (Java, Gradle, SQL, properties): смысл передают имена и `@Step`.
-- Вход в тестах только через UI; токены в localStorage не подставлять.
-- Проход сценария через Playwright MCP — не запуск теста. Успех подтверждается JUnit-прогоном через Gradle.
-- Тестовые данные создаются и удаляются фикстурами (`@User` → `UserExtension` → `UserFixture`), без широких `DELETE`/`TRUNCATE`.
+В Java, Gradle, SQL и properties модуля нет комментариев и Javadoc. Вход в тестах только через UI; токены в `localStorage` не подставлять. Успех — JUnit через Gradle, не проход сценария в MCP. Данные — фикстуры (`@User` → `UserExtension` → `UserFixture`), без широких `DELETE` / `TRUNCATE`.

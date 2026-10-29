@@ -6,16 +6,17 @@ E2E-тесты Rangiffler: JUnit 6.1.3, Playwright Java 1.63 (`@UsePlaywright`),
 
 ```bash
 ./gradlew :rfr-e2e:installPlaywright                      # один раз: браузер Chromium
-./gradlew :rfr-e2e:test --tests '*RegistrationTest' --rerun-tasks
-./gradlew :rfr-e2e:test --tests '*MainPageTest' --rerun-tasks
+./gradlew e2e                                             # все тесты rfr-e2e
+./gradlew :rfr-e2e:test --tests '*RegistrationWebTest'
+./gradlew :rfr-e2e:test --tests '*RegistrationWebTest.shouldAuthorizeAfterRegistration'
 ./gradlew :rfr-e2e:allureReport                           # rfr-e2e/build/reports/allure-report/allureReport/index.html
 ```
 
-Стенд: MySQL `:3306`, `rfr-auth :9001`, `rfr-api :8081`, фронт `:3001` (см. корневой README).
+Стенд (см. корневой `AGENTS.md` / README): MySQL `:3306`, `rfr-auth :9001`, `rfr-api :8081`, фронт `:3001`. `:rfr-e2e:test` всегда выполняется (`outputs.upToDateWhen { false }`).
 
 ## Конфигурация
 
-`TestConfig` читает `-Drfr.<ключ>` → `RFR_<КЛЮЧ>` → значение по умолчанию. Gradle передаёт все `-Drfr.*` в тестовую JVM.
+`TestConfig` в тестовой JVM читает `-Drfr.<ключ>`, иначе `RFR_<КЛЮЧ>`, иначе значение по умолчанию. Gradle пробрасывает в тесты `rfr.frontUrl`, `rfr.authUrl`, `rfr.apiUrl`; остальные ключи — через переменные окружения `RFR_*`.
 
 | Ключ | По умолчанию |
 |---|---|
@@ -37,12 +38,12 @@ E2E-тесты Rangiffler: JUnit 6.1.3, Playwright Java 1.63 (`@UsePlaywright`),
 | `data`  | тестовые данные и их владельцы: `TestUser`, `UserFixture`; `db` — `Databases`, `Jdbc` |
 | `utils` | статические утилиты без состояния: `RandomDataUtils` — случайные username/password; сюда же будущие генераторы (описания фото и т.п.) |
 | `ui`   | `page` — Page Objects, `component` — общие части страниц |
-| `test`  | только тесты, по фичам: `auth`, позже `profile`, `people`, … |
+| `test`  | только тесты, по фичам: `auth`, `profile`, `web`, `fake` |
 
 Правила: в `jupiter` нет SQL и локаторов; в `data` нет JUnit; в `test` нет локаторов и SQL; `ThreadLocal` для состояния теста не используется — состояние живёт в Store расширения.
 
 
 ## Агент
 
-Page Objects пишет Cursor AI по skill `rfr-page-objects`; UI исследуется через Playwright MCP (`.mcp.json`).   
-Доказательство корректности теста - запуск gradle таски
+Page Objects пишет Cursor AI по skill `rfr-page-objects`; UI в браузере подтверждают через MCP Cursor (`cursor-ide-browser`).
+Доказательство корректности теста — запуск Gradle-задачи (`./gradlew e2e` или `:rfr-e2e:test`).

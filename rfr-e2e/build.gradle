@@ -47,8 +47,17 @@ allure {
 
 test {
     useJUnitPlatform()
+    outputs.upToDateWhen { false }
     systemProperty 'rfr.frontUrl', System.getProperty('rfr.frontUrl', 'http://localhost:3001')
     systemProperty 'rfr.authUrl', System.getProperty('rfr.authUrl', 'http://localhost:9001')
     systemProperty 'rfr.apiUrl', System.getProperty('rfr.apiUrl', 'http://localhost:8081')
     jvmArgumentProviders.add({ ["-javaagent:${configurations.agent.singleFile}"] } as CommandLineArgumentProvider)
+}
+
+tasks.register('installPlaywright', JavaExec) {
+    group = 'verification'
+    description = 'Downloads Playwright Chromium once'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.microsoft.playwright.CLI'
+    args 'install', 'chromium'
 }
