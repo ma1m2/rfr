@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "command": "node .cursor/hooks/compile-changed.mjs",
+        "matcher": "Write|StrReplace",
+        "timeout": 180
+      }
+    ]
+  }
+}

@@ -17,6 +17,6 @@ MySQL — порт 3306, пользователь `root`, пароль `secret`.
 
 - MySQL: `localenv.sh` (`docker compose up -d mysql --wait`).
 - Оба бэкенда: `./gradlew runAll` (`rfr-auth` 9001 и `rfr-api` 8081).
-- Фронт: в `rfr-gql-client` — `npm ci` (один раз), затем `npm run dev` (`http://localhost:3001`).
+- Фронт: в `rfr-gql-client` — `npm ci` (один раз), затем только команду `npm run dev` (`http://localhost:3001`).
 - E2E: `./gradlew e2e` (все тесты `rfr-e2e`).
 - Нужны JDK 25, Node 22+, Docker.

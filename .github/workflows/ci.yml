@@ -1,10 +1,56 @@
 name: CI
 
 on:
-  pull_request:
+  push: # Триггер на любой пуш в любую ветку
+  # pull_request:
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth: ${{ steps.filter.outputs.auth }}
+      api: ${{ steps.filter.outputs.api }}
+      e2e: ${{ steps.filter.outputs.e2e }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            auth:
+              - 'rfr-auth/**'
+              - 'build.gradle'
+              - 'settings.gradle'
+              - 'gradle/**'
+              - 'gradlew'
+              - 'gradlew.bat'
+              - '.github/workflows/ci.yml'
+            api:
+              - 'rfr-api/**'
+              - 'build.gradle'
+              - 'settings.gradle'
+              - 'gradle/**'
+              - 'gradlew'
+              - 'gradlew.bat'
+              - '.github/workflows/ci.yml'
+            e2e:
+              - 'rfr-e2e/**'
+              - 'build.gradle'
+              - 'settings.gradle'
+              - 'gradle/**'
+              - 'gradlew'
+              - 'gradlew.bat'
+              - '.github/workflows/ci.yml'
+            frontend:
+              - 'rfr-gql-client/**'
+              - '.github/workflows/ci.yml'
+
   backend:
+    needs: changes
+    if: needs.changes.outputs.auth == 'true' || needs.changes.outputs.api == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -14,9 +60,18 @@ jobs:
           java-version: "25"
           cache: gradle
       - name: Build backends
-        run: ./gradlew --no-daemon :rfr-auth:build :rfr-api:build -x test
+        env:
+          BUILD_AUTH: ${{ needs.changes.outputs.auth }}
+          BUILD_API: ${{ needs.changes.outputs.api }}
+        run: |
+          tasks=()
+          if [ "$BUILD_AUTH" = true ]; then tasks+=(":rfr-auth:build"); fi
+          if [ "$BUILD_API" = true ]; then tasks+=(":rfr-api:build"); fi
+          ./gradlew --no-daemon "${tasks[@]}" -x test
 
   e2e:
+    needs: changes
+    if: needs.changes.outputs.e2e == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -29,6 +84,8 @@ jobs:
         run: ./gradlew --no-daemon e2eClasses
 
   frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
