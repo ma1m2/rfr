@@ -114,9 +114,11 @@ jobs:
           wait_port() {
             local port="$1"
             local deadline=$((SECONDS + 180))
-            while ! (echo >/dev/tcp/127.0.0.1/"$port") >/dev/null 2>&1; do
+            while ! (echo >/dev/tcp/localhost/"$port") >/dev/null 2>&1; do
               if [ "$SECONDS" -ge "$deadline" ]; then
                 echo "Port $port was not open within 180s"
+                echo "=== listeners ==="
+                ss -ltnp || true
                 echo "=== runAll.log ==="
                 cat /tmp/runAll.log || true
                 echo "=== vite.log ==="
