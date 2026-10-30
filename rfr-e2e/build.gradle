@@ -47,10 +47,19 @@ allure {
 
 test {
     useJUnitPlatform()
+    outputs.upToDateWhen { false }
     System.properties.each { key, value ->
         if (key.toString().startsWith('rfr.')) {
             systemProperty key.toString(), value
         }
     }
     jvmArgumentProviders.add({ ["-javaagent:${configurations.agent.singleFile}"] } as CommandLineArgumentProvider)
+}
+
+tasks.register('installPlaywright', JavaExec) {
+    group = 'verification'
+    description = 'Downloads Playwright Chromium once'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.microsoft.playwright.CLI'
+    args 'install', 'chromium'
 }
