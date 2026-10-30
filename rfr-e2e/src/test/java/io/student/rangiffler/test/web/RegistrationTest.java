@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 @Feature("Auth")
 @Story("Registration")
 @Tag("web")
-class RegistrationWebTest extends BaseWebTest {
+class RegistrationTest extends BaseWebTest {
 
   private UserFixture userFixture;
 
@@ -33,6 +33,7 @@ class RegistrationWebTest extends BaseWebTest {
         .clickSignIn()
         .clickLogin()
         .fillLoginForm(user.username(), user.password())
+        .clickSignIn()
         .openProfile()
         .checkThatUsername(user.username());
   }

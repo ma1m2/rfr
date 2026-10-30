@@ -48,9 +48,11 @@ allure {
 test {
     useJUnitPlatform()
     outputs.upToDateWhen { false }
-    systemProperty 'rfr.frontUrl', System.getProperty('rfr.frontUrl', 'http://localhost:3001')
-    systemProperty 'rfr.authUrl', System.getProperty('rfr.authUrl', 'http://localhost:9001')
-    systemProperty 'rfr.apiUrl', System.getProperty('rfr.apiUrl', 'http://localhost:8081')
+    System.properties.each { key, value ->
+        if (key.toString().startsWith('rfr.')) {
+            systemProperty key.toString(), value
+        }
+    }
     jvmArgumentProviders.add({ ["-javaagent:${configurations.agent.singleFile}"] } as CommandLineArgumentProvider)
 }
 

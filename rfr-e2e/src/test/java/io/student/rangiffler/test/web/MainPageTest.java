@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 @Feature("Auth")
 @Story("Login")
 @Tag("web")
-class MainPageWebTest extends BaseWebTest {
+class MainPageTest extends BaseWebTest {
 
   @Test
   @DisplayName("Existing user can authorize into the cabinet")
@@ -24,6 +24,7 @@ class MainPageWebTest extends BaseWebTest {
         .open()
         .clickLogin()
         .fillLoginForm(user.username(), user.password())
+        .clickSignIn()
         .openProfile()
         .checkThatUsername(user.username());
   }
