@@ -16,7 +16,7 @@ E2E-тесты Rangiffler: JUnit 6.1.3, Playwright Java 1.63 (`@UsePlaywright`),
 
 ## Конфигурация
 
-`TestConfig` читает `-Drfr.<ключ>` → `RFR_<КЛЮЧ>` → значение по умолчанию. Gradle передаёт в тестовую JVM только явно заданные `-Drfr.*` и не подставляет localhost, чтобы не перекрывать `RFR_*`.
+`TestConfig` в тестовой JVM читает `-Drfr.<ключ>`, иначе `RFR_<КЛЮЧ>`, иначе значение по умолчанию. Gradle передаёт только явно заданные `-Drfr.*` и не подставляет localhost, чтобы не перекрывать `RFR_*`.
 
 | Ключ | По умолчанию |
 |---|---|
@@ -45,5 +45,6 @@ E2E-тесты Rangiffler: JUnit 6.1.3, Playwright Java 1.63 (`@UsePlaywright`),
 
 ## Агент
 
-Page Objects пишет Cursor по skill `rfr-page-objects` (`.cursor/skills/rfr-page-objects/SKILL.md`); UI в браузере подтверждают через MCP Cursor (`cursor-ide-browser`).
-Доказательство корректности теста — запуск Gradle-задачи (`./gradlew e2e` или `:rfr-e2e:test`). Домашнее задание — `docs/lessons/01/homework/README.md`.
+Page Objects пишет Cursor AI по skill `rfr-page-objects`;   
+UI в браузере подтверждают через MCP Cursor (`cursor-ide-browser`).   
+Доказательство корректности теста — запуск Gradle-задачи (`./gradlew e2e` или `:rfr-e2e:test`).

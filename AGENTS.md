@@ -24,19 +24,6 @@ MySQL — порт 3306, пользователь `root`, пароль `secret`.
 
 Стенд уже должен быть поднят. Один раз на машину: `./gradlew :rfr-e2e:installPlaywright` (Chromium).
 
-<<<<<<< HEAD
 - Все тесты: `./gradlew e2e`
-- Один класс: `./gradlew :rfr-e2e:test --tests '*RegistrationWebTest'`
-- Один метод: `./gradlew :rfr-e2e:test --tests '*RegistrationWebTest.shouldAuthorizeAfterRegistration'`
-=======
-Настройки тестов — `TestConfig`: `-Drfr.<ключ>=…` или переменная `RFR_<КЛЮЧ>`, иначе значение по умолчанию. Подробности — `rfr-e2e/README.md`.
-
-## Правила для rfr-e2e
-
-- Структура пакетов — `rfr-e2e/README.md`, раздел «Архитектура»: `config`, `jupiter`, `data`, `api`, `ui`, `assertions`, `test`. Новые классы кладутся в существующие пакеты.
-- Page Objects и компоненты — по skill `rfr-page-objects` (`.cursor/skills/rfr-page-objects/SKILL.md`).
-- Без комментариев и Javadoc в коде `rfr-e2e` (Java, Gradle, SQL, properties): смысл передают имена и `@Step`.
-- Вход в тестах только через UI; токены в localStorage не подставлять.
-- Проход сценария через Playwright MCP — не запуск теста. Успех подтверждается JUnit-прогоном через Gradle.
-- Тестовые данные создаются и удаляются фикстурами (`@User` → `UserExtension` → `UserFixture`), без широких `DELETE`/`TRUNCATE`.
->>>>>>> origin/master
+- Один класс: `./gradlew :rfr-e2e:test --tests '*RegistrationTest'`
+- Один метод: `./gradlew :rfr-e2e:test --tests '*RegistrationTest.shouldAuthorizeAfterRegistration'`
