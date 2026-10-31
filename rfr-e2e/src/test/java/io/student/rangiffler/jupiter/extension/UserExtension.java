@@ -2,6 +2,9 @@ package io.student.rangiffler.jupiter.extension;
 
 import io.student.rangiffler.data.TestUser;
 import io.student.rangiffler.data.UserFixture;
+import io.student.rangiffler.data.UserRequest;
+import io.student.rangiffler.data.db.Friendships;
+import io.student.rangiffler.data.db.Profile;
 import io.student.rangiffler.jupiter.annotation.User;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -11,6 +14,8 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
 import java.lang.reflect.Parameter;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public final class UserExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
   private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(UserExtension.class);
@@ -25,7 +30,8 @@ public final class UserExtension implements BeforeEachCallback, AfterEachCallbac
       if (parameters[index].getType() != TestUser.class) {
         continue;
       }
-      UserFixture fixture = new UserFixture(TestUser.unique());
+      User annotation = parameters[index].getAnnotation(User.class);
+      UserFixture fixture = new UserRequest(annotation.friends(), annotation.incomeInvitations()).fixture();
       context.getStore(NAMESPACE).put(key(index), fixture);
       fixture.create();
     }
@@ -58,7 +64,13 @@ public final class UserExtension implements BeforeEachCallback, AfterEachCallbac
       }
       UserFixture fixture = context.getStore(NAMESPACE).remove(key(index), UserFixture.class);
       if (fixture != null) {
+        String id = new Profile(fixture.user().username()).id();
         fixture.close();
+        assertEquals(
+            0,
+            new Friendships(fixture.user().username()).remaining(id),
+            "Expected no friendships after close for " + fixture.user().username()
+        );
       }
     }
   }

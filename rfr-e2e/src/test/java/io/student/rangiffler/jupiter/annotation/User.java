@@ -12,4 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith(UserExtension.class)
 public @interface User {
+  int friends() default 0;
+  int incomeInvitations() default 0;
 }

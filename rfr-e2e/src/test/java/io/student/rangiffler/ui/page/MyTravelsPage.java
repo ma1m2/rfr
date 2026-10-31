@@ -21,4 +21,9 @@ public final class MyTravelsPage {
   public ProfilePage openProfile() {
     return header.openProfile();
   }
+
+  @Step("Open people")
+  public PeoplePage openPeople() {
+    return header.openPeople();
+  }
 }
