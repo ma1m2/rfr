@@ -3,10 +3,16 @@ package io.student.rangiffler.data.db;
 public final class Friendship implements Stored {
   private final String requester;
   private final String addressee;
+  private final FriendshipStatus status;
 
   public Friendship(String requester, String addressee) {
+    this(requester, addressee, FriendshipStatus.ACCEPTED);
+  }
+
+  public Friendship(String requester, String addressee, FriendshipStatus status) {
     this.requester = requester;
     this.addressee = addressee;
+    this.status = status;
   }
 
   @Override
@@ -29,7 +35,7 @@ public final class Friendship implements Stored {
         .sql(Jdbc.sql("sql/api/delete-friendship.sql"))
         .param("requester", requester)
         .param("addressee", addressee)
-        .param("status", "ACCEPTED")
+        .param("status", status.name())
         .update();
   }
 
@@ -39,7 +45,7 @@ public final class Friendship implements Stored {
         .sql(Jdbc.sql("sql/api/exists-friendship.sql"))
         .param("requester", requester)
         .param("addressee", addressee)
-        .param("status", "ACCEPTED")
+        .param("status", status.name())
         .query((rs, rowNum) -> rs.getInt(1))
         .single() > 0;
   }

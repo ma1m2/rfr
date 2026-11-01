@@ -29,7 +29,7 @@ public final class Invitation implements Stored {
         .sql(Jdbc.sql("sql/api/delete-friendship.sql"))
         .param("requester", requester)
         .param("addressee", addressee)
-        .param("status", "PENDING")
+        .param("status", FriendshipStatus.PENDING.name())
         .update();
   }
 
@@ -39,7 +39,7 @@ public final class Invitation implements Stored {
         .sql(Jdbc.sql("sql/api/exists-friendship.sql"))
         .param("requester", requester)
         .param("addressee", addressee)
-        .param("status", "PENDING")
+        .param("status", FriendshipStatus.PENDING.name())
         .query((rs, rowNum) -> rs.getInt(1))
         .single() > 0;
   }

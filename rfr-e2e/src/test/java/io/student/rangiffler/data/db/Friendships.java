@@ -15,15 +15,15 @@ public final class Friendships {
   }
 
   public boolean exists() {
-    return count("ACCEPTED") > 0;
+    return count(FriendshipStatus.ACCEPTED) > 0;
   }
 
   public int accepted() {
-    return count("ACCEPTED");
+    return count(FriendshipStatus.ACCEPTED);
   }
 
   public int pending() {
-    return count("PENDING");
+    return count(FriendshipStatus.PENDING);
   }
 
   public int remaining(String id) {
@@ -34,11 +34,11 @@ public final class Friendships {
         .single();
   }
 
-  private int count(String status) {
+  private int count(FriendshipStatus status) {
     return Jdbc.client(Databases.API)
         .sql(Jdbc.sql("sql/api/count-friendships.sql"))
         .param("username", username)
-        .param("status", status)
+        .param("status", status.name())
         .query((rs, rowNum) -> rs.getInt(1))
         .single();
   }

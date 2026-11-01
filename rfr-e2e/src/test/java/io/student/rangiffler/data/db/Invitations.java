@@ -22,7 +22,7 @@ public final class Invitations {
     return Jdbc.client(Databases.API)
         .sql(Jdbc.sql("sql/api/count-friendships.sql"))
         .param("username", username)
-        .param("status", "PENDING")
+        .param("status", FriendshipStatus.PENDING.name())
         .query((rs, rowNum) -> rs.getInt(1))
         .single();
   }
