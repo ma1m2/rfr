@@ -1,6 +1,7 @@
 # rfr-e2e
 
-Page Objects — skill `rfr-page-objects`. Подробности — `README.md`.
+Page Objects — skill `rfr-page-objects`. Подробности — `README.md`.   
+Ревью владения ресурсами — субагент `test-reviewer` и skill `rfr-test-review`.
 
 Пакеты: `config`, `jupiter`, `data`, `api`, `ui`, `assertions`, `test`. Новые классы — в существующие пакеты.
 
