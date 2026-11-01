@@ -80,7 +80,7 @@ Mock контроллеры возвращают статические данн
 bash localenv.sh
 ```
 
-Скрипт выполняет `docker compose up -d mysql --wait` (файл `docker-compose.yml`): поднимает контейнер `rfr-mysql` и ждёт `healthy`. Остальные контейнеры на машине не трогает. Эквивалент из корня: `docker compose up -d mysql --wait`.
+Скрипт поднимает MySQL из `docker-compose.yml` (`docker compose up -d mysql --wait`) и ждёт `healthy`. Если имя `rfr-mysql` занято контейнером не из этого Compose (старый `localenv.sh` создавал его через `docker run`), скрипт удаляет только контейнер. Том `mysql-volume` не удаляется, данные сохраняются. Контейнер, которым уже управляет этот Compose, и остальные контейнеры на машине не трогает.
 
 #### 2. Запусти rfr-auth и rfr-api:
 
