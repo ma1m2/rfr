@@ -8,21 +8,23 @@ description: Ревьюирует тестовый код rfr-e2e на влад�
 Ресурс — всё, что тест получает и обязан вернуть (строки в БД, `Page`, `BrowserContext`); для каждого ресурса найти владельца, момент получения, место хранения, момент освобождения.
 
 ## Правила
-**1. Владелец — дерево декораторов.** В Store лежит только корень `UserFixture` из `UserRequest.fixture()` (`UserWithIncomeInvitations` → `UserWithFriendsFixture` → `SingleUserFixture`); Store закрывает его как `AutoCloseable`. Каждый декоратор владеет своим `origin` и `partners` (`friends` / `invitations`). Поля `UserExtension`, статика и `ThreadLocal` ресурсом не владеют.
+**1. Владелец — дерево декораторов.** В Store лежит только корень `UserFixture` из `UserRequest.fixture()` (`UserWithRelationsFixture` на каждый ненулевой счётчик → `SingleUserFixture`); Store закрывает его как `AutoCloseable`. Каждый декоратор владеет своим `origin` и `partners`. Поля `UserExtension`, статика и `ThreadLocal` ресурсом не владеют.
 
-**2. Регистрация до частичной подготовки.** `UserExtension.beforeEach` делает `put` в Store до `create()`; `create()` не атомарен (`AuthAccount`, `Profile`, партнёры, `Friendship`/`Invitation`), поэтому `close()` обязан работать после падения на любом шаге.
+**2. Регистрация до частичной подготовки.** `UserExtension.beforeEach` делает `put` в Store до `create()`; `create()` не атомарен (`AuthAccount`, `Profile`, партнёры, `Friendship`), поэтому `close()` обязан работать после падения на любом шаге.
 
 **3. Симметрия create/close.** Декоратор удаляет ровно то, что создал, адресно по `username`, в обратном порядке (свои строки → `partners` → `origin`) через `TearDown`, чтобы шаги были независимы и ошибки не терялись. Без широких `DELETE`/`TRUNCATE`.
 
 **4. Новое предусловие — новый декоратор.** Композиция в `UserRequest.fixture()`, а не флаг в `BaseUserFixture` и не ветка в `UserExtension`; extension знает только `UserRequest` и `UserFixture`.
 
-**5. Один `@User` — один параметр `TestUser`.** Один ключ Store `"user-" + index`; связанные пользователи — внутри `TestUser` (`friends()`, `incomeInvitations()`) и дерева фикстур, не отдельными параметрами.
+**5. Один `@User` — один параметр `TestUser`.** Один ключ Store `"user-" + index`; связанные пользователи — внутри `TestUser` (`friends()`, `incomeInvitations()`, `outcomeInvitations()`) и дерева фикстур, не отдельными параметрами.
 
 **6. Браузерными ресурсами владеет `@UsePlaywright`.** `Page` и `BrowserContext` не создаются и не закрываются в тестах и extension'ах (`@WebTest` → `PlaywrightOptionsFactory`).
 
 **7. Слои.** В `jupiter` нет SQL и локаторов; в `data` нет JUnit, SQL только в `data/db`, `db` не зависит от `data`; в `test` нет локаторов и SQL.
 
 **8. Каждый вывод подтверждён.** Проба в `jupiter/probe/UserExtensionTest` (`EngineTestKit`, `exists()` из `db`, цели `Observed` и `FailingCase`) или конкретная строка кода; без найденной причины изменений не предлагать.
+
+**9. Пул — аренда слота.** Пользователи, которых нельзя создать, ждут в одной на JVM очереди. Взятый слот лежит в экземпляре `StaticUserFixture` в Store, не в статике и не в поле extension. `UsersQueueExtension.beforeEach` делает `put` до `create()`. Пустая очередь: `create()` ждёт с таймаутом и падает, слот при этом не взят. `close()` возвращает только взятого и не удаляет строки в БД. Проба — `UsersQueueExtensionTest`.
 
 ## Формат ответа
 

@@ -21,6 +21,7 @@ public final class Friendship implements Stored {
         .sql(Jdbc.sql("sql/api/create-friendship.sql"))
         .param("requester", requester)
         .param("addressee", addressee)
+        .param("status", status.name())
         .update();
     if (updated != 1) {
       throw new IllegalStateException(

@@ -1,6 +1,5 @@
 package io.student.rangiffler.data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.student.rangiffler.utils.RandomDataUtils.randomPassword;
@@ -11,24 +10,28 @@ public final class TestUser {
   private final String password;
   private final List<TestUser> friends;
   private final List<TestUser> incomeInvitations;
+  private final List<TestUser> outcomeInvitations;
 
   public TestUser(String username, String password) {
-    this(username, password, List.of(), List.of());
+    this(username, password, List.of(), List.of(), List.of());
   }
 
-  public TestUser(String username, String password, List<TestUser> friends, List<TestUser> incomeInvitations) {
+  public TestUser(
+      String username,
+      String password,
+      List<TestUser> friends,
+      List<TestUser> incomeInvitations,
+      List<TestUser> outcomeInvitations
+  ) {
     this.username = username;
     this.password = password;
     this.friends = List.copyOf(friends);
     this.incomeInvitations = List.copyOf(incomeInvitations);
+    this.outcomeInvitations = List.copyOf(outcomeInvitations);
   }
 
   public static TestUser unique() {
-    return unique(0, 0);
-  }
-
-  public static TestUser unique(int friends, int incomeInvitations) {
-    return new TestUser(randomUsername(), randomPassword(), users(friends), users(incomeInvitations));
+    return new TestUser(randomUsername(), randomPassword());
   }
 
   public String username() {
@@ -47,11 +50,19 @@ public final class TestUser {
     return incomeInvitations;
   }
 
-  private static List<TestUser> users(int count) {
-    List<TestUser> users = new ArrayList<>(count);
-    for (int index = 0; index < count; index++) {
-      users.add(unique());
-    }
-    return users;
+  public List<TestUser> outcomeInvitations() {
+    return outcomeInvitations;
+  }
+
+  public TestUser withFriends(List<TestUser> friends) {
+    return new TestUser(username, password, friends, incomeInvitations, outcomeInvitations);
+  }
+
+  public TestUser withIncomeInvitations(List<TestUser> incomeInvitations) {
+    return new TestUser(username, password, friends, incomeInvitations, outcomeInvitations);
+  }
+
+  public TestUser withOutcomeInvitations(List<TestUser> outcomeInvitations) {
+    return new TestUser(username, password, friends, incomeInvitations, outcomeInvitations);
   }
 }
