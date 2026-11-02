@@ -19,7 +19,8 @@ public final class TestConfig {
   }
 
   public static String dbUrl(String schema) {
-    return value("dbUrl", "jdbc:mysql://localhost:3306") + "/" + schema + "?serverTimezone=UTC";
+    return value("dbUrl", "jdbc:mysql://localhost:3306") + "/" + schema
+        + "?serverTimezone=UTC&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci";
   }
 
   public static String dbUser() {
