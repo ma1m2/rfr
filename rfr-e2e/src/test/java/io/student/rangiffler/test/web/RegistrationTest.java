@@ -5,6 +5,7 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import io.student.rangiffler.data.TestUser;
+import io.student.rangiffler.data.SingleUserFixture;
 import io.student.rangiffler.data.UserFixture;
 import io.student.rangiffler.ui.page.LandingPage;
 import org.junit.jupiter.api.AfterEach;
@@ -24,7 +25,7 @@ class RegistrationTest extends BaseWebTest {
   @DisplayName("User can register and then authorize into the cabinet")
   void shouldAuthorizeAfterRegistration(Page page) {
     TestUser user = TestUser.unique();
-    userFixture = new UserFixture(user);
+    userFixture = new SingleUserFixture(user);
     new LandingPage(page)
         .open()
         .clickRegister()
