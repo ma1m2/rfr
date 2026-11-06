@@ -7,8 +7,6 @@ import io.qameta.allure.Story;
 import io.student.rangiffler.data.TestUser;
 import io.student.rangiffler.jupiter.annotation.User;
 import io.student.rangiffler.test.web.BaseWebTest;
-import io.student.rangiffler.ui.page.LandingPage;
-import io.student.rangiffler.ui.page.PeoplePage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -38,14 +36,5 @@ class FriendsTabTest extends BaseWebTest {
   void shouldShowEmptyFriends(@User TestUser user, Page page) {
     openPeople(page, user)
         .checkThatNoUsers("There are no users yet");
-  }
-
-  private static PeoplePage openPeople(Page page, TestUser user) {
-    return new LandingPage(page)
-        .open()
-        .clickLogin()
-        .fillLoginForm(user.username(), user.password())
-        .clickSignIn()
-        .openPeople();
   }
 }
