@@ -34,3 +34,7 @@ Thumbs.db
 
 # Local agent notes
 docs/
+
+# Local backups and one-off scripts
+*.bak
+tmp-*
