@@ -9,8 +9,6 @@ import io.student.rangiffler.data.db.Invitations;
 import io.student.rangiffler.data.TestUser;
 import io.student.rangiffler.jupiter.annotation.User;
 import io.student.rangiffler.test.web.BaseWebTest;
-import io.student.rangiffler.ui.page.LandingPage;
-import io.student.rangiffler.ui.page.PeoplePage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -52,14 +50,5 @@ class PeopleTest extends BaseWebTest {
         .clickAdd(other.username())
         .checkThatInvitationWaiting(other.username());
     assertEquals(1, invitations.count(), "Expected one pending invitation after Add for " + user.username());
-  }
-
-  private static PeoplePage openPeople(Page page, TestUser user) {
-    return new LandingPage(page)
-        .open()
-        .clickLogin()
-        .fillLoginForm(user.username(), user.password())
-        .clickSignIn()
-        .openPeople();
   }
 }
