@@ -21,6 +21,7 @@ public final class PeoplePage {
   private final Locator searchButton;
   private final Locator removeButtons;
   private final Locator acceptButtons;
+  private final Locator emptyUsers;
 
   public PeoplePage(Page page) {
     this.page = page;
@@ -41,6 +42,7 @@ public final class PeoplePage {
     this.searchButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("search").setExact(true));
     this.removeButtons = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Remove").setExact(true));
     this.acceptButtons = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Accept").setExact(true));
+    this.emptyUsers = page.getByRole(AriaRole.TABPANEL).getByRole(AriaRole.PARAGRAPH);
   }
 
   @Step("Open friends tab")
@@ -141,7 +143,7 @@ public final class PeoplePage {
 
   @Step("Check that people list is empty: {message}")
   public PeoplePage checkThatNoUsers(String message) {
-    assertThat(page.getByRole(AriaRole.PARAGRAPH)).hasText(message);
+    assertThat(emptyUsers).hasText(message);
     return this;
   }
 
