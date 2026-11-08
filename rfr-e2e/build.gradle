@@ -46,6 +46,15 @@ allure {
     }
 }
 
+processTestResources {
+    from("${rootProject.projectDir}/rfr-auth/src/main/resources/db/migration/rangiffler-auth") {
+        into 'db/migration/rangiffler-auth'
+    }
+    from("${rootProject.projectDir}/rfr-api/src/main/resources/db/migration/rangiffler-api") {
+        into 'db/migration/rangiffler-api'
+    }
+}
+
 test {
     useJUnitPlatform()
     outputs.upToDateWhen { false }

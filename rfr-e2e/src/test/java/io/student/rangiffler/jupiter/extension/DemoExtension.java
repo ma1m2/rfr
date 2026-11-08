@@ -1,5 +1,6 @@
-package io.student.rangiffler.test.demo;
+package io.student.rangiffler.jupiter.extension;
 
+import io.student.rangiffler.test.demo.DemoValue;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterClassTemplateInvocationCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;

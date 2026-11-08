@@ -1,6 +1,7 @@
 package io.student.rangiffler.test.demo;
 
 import io.qameta.allure.Epic;
+import io.student.rangiffler.jupiter.extension.DemoExtension;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
