@@ -57,6 +57,6 @@ tasks.register('e2eClasses') {
 
 tasks.register('e2e') {
     group = 'verification'
-    description = 'Runs all tests in rfr-e2e'
-    dependsOn ':rfr-e2e:test'
+    description = 'Runs all tests in rfr-e2e through E2eSuite'
+    dependsOn ':rfr-e2e:e2e'
 }
