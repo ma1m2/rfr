@@ -2,18 +2,11 @@ package io.student.rangiffler.jupiter.extension;
 
 import io.student.rangiffler.data.db.Databases;
 import io.student.rangiffler.data.db.FlywaySchema;
-import org.junit.platform.launcher.LauncherSession;
-import org.junit.platform.launcher.LauncherSessionListener;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-public final class StandSchemaExtension implements LauncherSessionListener {
+public final class StandSchemaExtension implements SuiteExtension {
   @Override
-  public void launcherSessionOpened(LauncherSession session) {
-    System.out.println(
-        "StandSchemaExtension.launcherSessionOpened worker="
-            + System.getProperty("org.gradle.test.worker")
-            + " pid="
-            + ProcessHandle.current().pid()
-    );
+  public void beforeSuite(ExtensionContext context) {
     new FlywaySchema(Databases.AUTH, "rangiffler-auth").verify();
     new FlywaySchema(Databases.API, "rangiffler-api").verify();
   }
