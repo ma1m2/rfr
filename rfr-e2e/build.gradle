@@ -29,7 +29,6 @@ dependencies {
     testImplementation "com.microsoft.playwright:playwright:$playwrightVersion"
 
     testImplementation "org.junit.jupiter:junit-jupiter"
-    testImplementation "org.junit.platform:junit-platform-suite"
     testImplementation "org.junit.platform:junit-platform-testkit"
     testImplementation platform("org.springframework.boot:spring-boot-dependencies:4.1.1")
     testImplementation "org.springframework:spring-jdbc"
@@ -56,7 +55,8 @@ processTestResources {
     }
 }
 
-tasks.withType(Test).configureEach {
+test {
+    useJUnitPlatform()
     outputs.upToDateWhen { false }
     System.properties.each { key, value ->
         if (key.toString().startsWith('rfr.')) {
@@ -64,20 +64,6 @@ tasks.withType(Test).configureEach {
         }
     }
     jvmArgumentProviders.add({ ["-javaagent:${configurations.agent.singleFile}"] } as CommandLineArgumentProvider)
-}
-
-test {
-    useJUnitPlatform {
-        excludeEngines 'junit-platform-suite'
-    }
-}
-
-tasks.register('e2e', Test) {
-    group = 'verification'
-    description = 'Runs tests through E2eSuite'
-    testClassesDirs = sourceSets.test.output.classesDirs
-    classpath = sourceSets.test.runtimeClasspath
-    useJUnitPlatform()
 }
 
 tasks.register('installPlaywright', JavaExec) {
