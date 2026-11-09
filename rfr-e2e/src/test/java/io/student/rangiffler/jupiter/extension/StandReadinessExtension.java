@@ -4,15 +4,19 @@ import io.student.rangiffler.config.TestConfig;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public final class StandReadinessExtension implements SuiteExtension {
@@ -43,7 +47,10 @@ public final class StandReadinessExtension implements SuiteExtension {
 
     private void await() {
       long deadline = System.nanoTime() + this.limit.toNanos();
-      try (HttpClient client = HttpClient.newBuilder().connectTimeout(REQUEST).build()) {
+      try (HttpClient client = HttpClient.newBuilder()
+          .version(HttpClient.Version.HTTP_1_1)
+          .connectTimeout(REQUEST)
+          .build()) {
         while (true) {
           List<String> down = this.down(client);
           if (down.isEmpty()) {
@@ -98,9 +105,53 @@ public final class StandReadinessExtension implements SuiteExtension {
     }
 
     private boolean http(HttpClient client, String url) {
+      for (URI target : this.targets(URI.create(url))) {
+        if (this.send(client, target)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private Set<URI> targets(URI origin) {
+      Set<URI> targets = new LinkedHashSet<>();
+      targets.add(origin);
+      String host = origin.getHost();
+      if (host == null) {
+        return targets;
+      }
+      try {
+        for (InetAddress address : InetAddress.getAllByName(host)) {
+          targets.add(this.rewrite(origin, address));
+        }
+      } catch (UnknownHostException exception) {
+        return targets;
+      }
+      return targets;
+    }
+
+    private URI rewrite(URI origin, InetAddress address) {
+      String host = address.getHostAddress();
+      int zone = host.indexOf('%');
+      if (zone >= 0) {
+        host = host.substring(0, zone);
+      }
+      if (host.indexOf(':') >= 0) {
+        host = "[" + host + "]";
+      }
+      int port = origin.getPort();
+      String path = origin.getRawPath();
+      if (path == null || path.isEmpty()) {
+        path = "/";
+      }
+      String query = origin.getRawQuery() == null ? "" : "?" + origin.getRawQuery();
+      return URI.create(origin.getScheme() + "://" + host + (port < 0 ? "" : ":" + port) + path + query);
+    }
+
+    private boolean send(HttpClient client, URI target) {
       try {
         client.send(
-            HttpRequest.newBuilder(URI.create(url)).timeout(REQUEST).GET().build(),
+            HttpRequest.newBuilder(target).timeout(REQUEST).GET().build(),
             HttpResponse.BodyHandlers.discarding()
         );
         return true;
