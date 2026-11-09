@@ -46,15 +46,45 @@ allure {
     }
 }
 
-test {
-    useJUnitPlatform()
+def commit = providers.exec {
+    commandLine 'git', 'rev-parse', '--short', 'HEAD'
+    workingDir = rootProject.projectDir
+}.standardOutput.asText.map { it.trim() }.get()
+
+processTestResources {
+    from("${rootProject.projectDir}/rfr-auth/src/main/resources/db/migration/rangiffler-auth") {
+        into 'db/migration/rangiffler-auth'
+    }
+    from("${rootProject.projectDir}/rfr-api/src/main/resources/db/migration/rangiffler-api") {
+        into 'db/migration/rangiffler-api'
+    }
+}
+
+tasks.withType(Test).configureEach {
     outputs.upToDateWhen { false }
+    systemProperty 'rfr.commit', commit
     System.properties.each { key, value ->
         if (key.toString().startsWith('rfr.')) {
             systemProperty key.toString(), value
         }
     }
     jvmArgumentProviders.add({ ["-javaagent:${configurations.agent.singleFile}"] } as CommandLineArgumentProvider)
+}
+
+test {
+    useJUnitPlatform {
+        excludeTags 'ui'
+    }
+}
+
+tasks.register('e2e', Test) {
+    group = 'verification'
+    description = 'Runs UI tests after the stand is ready'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'ui'
+    }
 }
 
 tasks.register('installPlaywright', JavaExec) {
