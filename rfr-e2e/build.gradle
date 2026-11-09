@@ -46,6 +46,11 @@ allure {
     }
 }
 
+def commit = providers.exec {
+    commandLine 'git', 'rev-parse', '--short', 'HEAD'
+    workingDir = rootProject.projectDir
+}.standardOutput.asText.map { it.trim() }.get()
+
 processTestResources {
     from("${rootProject.projectDir}/rfr-auth/src/main/resources/db/migration/rangiffler-auth") {
         into 'db/migration/rangiffler-auth'
@@ -57,6 +62,7 @@ processTestResources {
 
 tasks.withType(Test).configureEach {
     outputs.upToDateWhen { false }
+    systemProperty 'rfr.commit', commit
     System.properties.each { key, value ->
         if (key.toString().startsWith('rfr.')) {
             systemProperty key.toString(), value

@@ -47,6 +47,10 @@ public final class TestConfig {
     return Long.parseLong(value("standTimeout", "180"));
   }
 
+  public static String commit() {
+    return value("commit", "");
+  }
+
   static String value(String key, String fallback) {
     String property = System.getProperty("rfr." + key);
     if (property != null && !property.isBlank()) {

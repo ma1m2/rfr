@@ -48,6 +48,20 @@ public final class FlywaySchema implements Schema {
     );
   }
 
+  @Override
+  public String version() {
+    try {
+      TreeSet<String> history = new TreeSet<>(this.history());
+      history.remove("0");
+      if (history.isEmpty()) {
+        return "0";
+      }
+      return history.last();
+    } catch (IllegalStateException exception) {
+      return "unavailable";
+    }
+  }
+
   private List<String> history() {
     try {
       return Jdbc.client(this.database)
