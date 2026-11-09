@@ -4,14 +4,14 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import io.qameta.allure.playwright.AllurePlaywright;
 import io.student.rangiffler.data.TestUser;
-import io.student.rangiffler.jupiter.annotation.WebTest;
+import io.student.rangiffler.jupiter.annotation.UiTest;
 import io.student.rangiffler.ui.page.LandingPage;
 import io.student.rangiffler.ui.page.PeoplePage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
-@WebTest
+@UiTest
 public abstract class BaseWebTest {
 
   @BeforeAll

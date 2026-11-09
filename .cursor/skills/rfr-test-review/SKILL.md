@@ -18,7 +18,7 @@ description: Ревьюирует тестовый код rfr-e2e на влад�
 
 **5. Один `@User` — один параметр `TestUser`.** Один ключ Store `"user-" + index`; связанные пользователи — внутри `TestUser` (`friends()`, `incomeInvitations()`, `outcomeInvitations()`) и дерева фикстур, не отдельными параметрами.
 
-**6. Браузерными ресурсами владеет `@UsePlaywright`.** `Page` и `BrowserContext` не создаются и не закрываются в тестах и extension'ах (`@WebTest` → `PlaywrightOptionsFactory`).
+**6. Браузерными ресурсами владеет `@UsePlaywright`.** `Page` и `BrowserContext` не создаются и не закрываются в тестах и extension'ах (`@UiTest` → `BrowserOptions`).
 
 **7. Слои.** В `jupiter` нет SQL и локаторов; в `data` нет JUnit, SQL только в `data/db`, `db` не зависит от `data`; в `test` нет локаторов и SQL.
 
