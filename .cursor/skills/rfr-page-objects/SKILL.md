@@ -1,6 +1,6 @@
 ---
 name: rfr-page-objects
-description: Создаёт и меняет Page Objects и компоненты UI Rangiffler на Playwright Java в rfr-e2e (пакеты ui/page и ui/component). Применять к страницам, локаторам, действиям и проверкам UI. Фикстуры, SQL и JUnit extensions — вне ответственности страниц.
+description: Создаёт и меняет Page Objects и компоненты UI Rangiffler на Playwright Java в rfr-e2e (пакеты ui/page и ui/component). Применять к страницам, локаторам, действиям и проверкам UI. Проверки — только Playwright web-first assertions, без JUnit/AssertJ/Hamcrest. Фикстуры, SQL и JUnit extensions — вне ответственности страниц.
 ---
 
 # Page Objects Rangiffler
@@ -16,7 +16,7 @@ description: Создаёт и меняет Page Objects и компоненты
 4. Каждый публичный метод страницы и компонента — с `@Step`, и каждый параметр (кроме секретных) попадает в текст шага: `@Step("Fill login form: {username}")`. Текст шага — на английском, `@Step` обязателен и для действий, и для проверок. Секретные параметры (`password`, токены) в текст шага не подставляй — только несекретные.
 5. Переход возвращает объект следующей страницы, действие и проверка на текущей — `this`.
 6. Одно бизнес-действие — один метод, имя которого называет форму: `fillLoginForm(username, password)`, `fillRegistrationForm(...)`. Без безликих `fillForm`/`fill`/`submit` и цепочек `fillUsername().fillPassword()`; отдельный метод на поле — только если тесту нужно именно поле (валидация). Примеры имён: `clickSubmit()`, `openProfile()`, `checkThatErrorShown(message)`, `checkThatUsername(username)`.
-7. Действие отдельно от проверки: `fill…`/`click…` ничего не проверяют; `checkThat…` только проверяют через `PlaywrightAssertions.assertThat(...)` и ничего не кликают. Допустимы обе формы ассерта — `assertThat(locator)` и `assertThat(page)`; `page`-ассерты — только когда предмет теста — переход (см. п. 8). Без `locator.isVisible()` в JUnit-проверках и ручных ожиданий.
+7. Действие отдельно от проверки: `fill…`/`click…` ничего не проверяют; `checkThat…` только проверяют и ничего не кликают. Единственные ассерты — web-first assertions Playwright: `PlaywrightAssertions.assertThat(locator)` и `assertThat(page)`. `page`-ассерты — только когда предмет теста — переход (см. п. 8). Запрещены любые другие: JUnit (`assertEquals`, `assertTrue`, `assertNotNull`, …), AssertJ, Hamcrest, `locator.isVisible()` / `isHidden()` / `textContent()` внутри проверки, ручные ожидания (`waitForSelector`, `waitForTimeout`) вместо assert.
 8. Без `checkThatOpened`, `checkPageLoaded`, `isLoaded`, `waitUntilLoaded`: `click`/`fill` ждут элемент, web-first assertions ждут состояние. URL и видимость страницы проверяем, только когда переход и есть предмет теста.
 9. Локаторы — в порядке приоритета: `getByTestId` → `getByRole` с точным `name` → `getByLabel`/`getByPlaceholder` → `getByText` с точным совпадением. Переходи на следующий уровень, только если предыдущий недоступен в разметке. Без `first()`/`nth()`, MUI-классов и XPath; неуникальный элемент сужай родителем: `page.getByRole(AriaRole.BANNER).getByRole(…)`.
 10. Проверка не должна быть тавтологией локатора: `assertThat(heading("Travels map")).hasText("Travels map")` ничего не доказывает. Ожидаемое значение приходит из теста параметром метода (`checkThatUsername(username)`), а не литералом внутри Page Object.
@@ -34,6 +34,7 @@ description: Создаёт и меняет Page Objects и компоненты
 | `assertThat(heading("Travels map")).hasText("Travels map")` | `checkThatHeading("Travels map")` | Ожидание — параметр из теста, не литерал страницы (п. 10) |
 | `page.locator(".MuiButton-root").first().click()` | `page.getByTestId("submit").click()` или `page.getByRole(BUTTON, name("Войти")).click()` | Без MUI-классов, `first()`/`nth()` (п. 9) |
 | клик внутри `checkThat…` | только `assertThat(...)`, без кликов в проверках | Действие отдельно от проверки (п. 7) |
+| `assertTrue(locator.isVisible())` / `assertEquals(text, locator.innerText())` / AssertJ / Hamcrest | `PlaywrightAssertions.assertThat(locator).isVisible()` / `.hasText(text)` | Только web-first assertions Playwright (п. 7) |
 | `class LoginPage extends BasePage` | `final class LoginPage` с полями-компонентами | Композиция вместо наследования (п. 3) |
 | `@Step("Fill login form: {username} / {password}")` | `@Step("Fill login form: {username}")` | Пароль не интерполируется в шаг — утечка в отчёт (п. 4) |
 | `getByRole(OPTION, name("France France"))` | `OPTION` + `setHas(IMG с точным именем страны)` | Accessible name option склеивает alt флага и текст (п. 13) |
