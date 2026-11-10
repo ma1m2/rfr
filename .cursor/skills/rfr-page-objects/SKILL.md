@@ -24,6 +24,7 @@ description: Создаёт и меняет Page Objects и компоненты
 12. Без комментариев и Javadoc: смысл передают имена методов и текст `@Step`.
 13. MUI `Select` — это `combobox`. Option не ищи по составному accessible name вроде «France France»: кликни `combobox`, затем `getByRole(OPTION)` с фильтром `setHas(getByRole(IMG, name страны, exact))`. Имя страны — параметр из теста.
 14. Если сразу после клика тест делает `reload()` или уходит со страницы, клик обязан дождаться ответа сервера: `page.waitForResponse(..., button::click)`. Для профиля — POST `/graphql` с операцией `UpdateUser`. Это синхронизация действия, не `waitUntilLoaded` и не проверка в `checkThat…`.
+15. Карточка или строка списка ищется от роли и уникального текста (`ARTICLE` + описание, `people-row` + username). Действия (`like`, `Photo actions`, `Add`) — только внутри этого компонента. Без `nth`/`first` и без поиска кнопки от всей страницы.
 
 ## Частые ошибки   
 
@@ -39,6 +40,7 @@ description: Создаёт и меняет Page Objects и компоненты
 | `@Step("Fill login form: {username} / {password}")` | `@Step("Fill login form: {username}")` | Пароль не интерполируется в шаг — утечка в отчёт (п. 4) |
 | `getByRole(OPTION, name("France France"))` | `OPTION` + `setHas(IMG с точным именем страны)` | Accessible name option склеивает alt флага и текст (п. 13) |
 | `save.click(); page.reload();` | `waitForResponse(..., save::click)` затем `reload()` | Иначе reload обгоняет мутацию `UpdateUser` (п. 14) |
+| `page.getByRole(BUTTON, name("like"))` | `card("Париж!").` like внутри `ARTICLE` | На ленте семь `like`; strict mode (п. 15) |
 
 ## Проверка результата
 

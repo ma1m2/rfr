@@ -32,7 +32,7 @@ public final class PeopleTable {
   public PeopleRow row(String username) {
     return new PeopleRow(
         page,
-        page.getByRole(AriaRole.ROW).filter(new Locator.FilterOptions().setHasText(username))
+        page.getByTestId("people-row").filter(new Locator.FilterOptions().setHasText(username))
     );
   }
 
