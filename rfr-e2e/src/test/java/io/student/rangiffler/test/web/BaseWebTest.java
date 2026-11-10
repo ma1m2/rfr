@@ -36,7 +36,6 @@ public abstract class BaseWebTest {
     AllurePlaywright.attachScreenshot("Last screenshot", page);
     AllurePlaywright.attachPageSource("Page source", page);
     AllurePlaywright.attachConsoleMessages("Browser console logs", page);
-    page.context().close();
   }
 
   protected final MyTravelsPage openMyTravels(Page page, TestUser user) {
