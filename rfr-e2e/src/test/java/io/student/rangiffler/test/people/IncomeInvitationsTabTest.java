@@ -7,6 +7,7 @@ import io.qameta.allure.Story;
 import io.student.rangiffler.data.TestUser;
 import io.student.rangiffler.jupiter.annotation.User;
 import io.student.rangiffler.test.web.BaseWebTest;
+import io.student.rangiffler.ui.page.PeopleTab;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class IncomeInvitationsTabTest extends BaseWebTest {
     TestUser friend = user.friends().getFirst();
     TestUser inviter = user.incomeInvitations().getFirst();
     openPeople(page, user)
-        .clickIncomeInvitations()
+        .openTab(PeopleTab.INCOME_INVITATIONS)
         .checkThatUsername(inviter.username())
         .checkThatAccept(inviter.username())
         .checkThatDecline(inviter.username())
@@ -36,7 +37,7 @@ class IncomeInvitationsTabTest extends BaseWebTest {
   @DisplayName("Income invitations tab is empty without invitations")
   void shouldShowEmptyIncomeInvitations(@User TestUser user, Page page) {
     openPeople(page, user)
-        .clickIncomeInvitations()
+        .openTab(PeopleTab.INCOME_INVITATIONS)
         .checkThatNoUsers("There are no users yet");
   }
 }

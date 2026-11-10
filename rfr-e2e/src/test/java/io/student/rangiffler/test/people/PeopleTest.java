@@ -9,6 +9,7 @@ import io.student.rangiffler.data.db.Invitations;
 import io.student.rangiffler.data.TestUser;
 import io.student.rangiffler.jupiter.annotation.User;
 import io.student.rangiffler.test.web.BaseWebTest;
+import io.student.rangiffler.ui.page.PeopleTab;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class PeopleTest extends BaseWebTest {
     assertEquals(1, new Invitations(user.username()).count(), "Expected one pending invitation for " + user.username());
     openPeople(page, user)
         .checkThatRemoveCount(2)
-        .clickIncomeInvitations()
+        .openTab(PeopleTab.INCOME_INVITATIONS)
         .checkThatAcceptCount(1);
   }
 
@@ -44,7 +45,7 @@ class PeopleTest extends BaseWebTest {
     Invitations invitations = new Invitations(user.username());
     assertEquals(0, invitations.count(), "Expected no pending invitations before UI action for " + user.username());
     openPeople(page, user)
-        .clickAllPeople()
+        .openTab(PeopleTab.ALL_PEOPLE)
         .searchPeople(other.username())
         .clickAdd(other.username())
         .checkThatInvitationWaiting(other.username());

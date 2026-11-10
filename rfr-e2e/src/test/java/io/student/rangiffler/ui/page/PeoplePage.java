@@ -1,6 +1,5 @@
 package io.student.rangiffler.ui.page;
 
-import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import io.qameta.allure.Step;
@@ -13,47 +12,18 @@ public final class PeoplePage {
 
   private final Page page;
   private final PeopleTable peopleTable;
-  private final Locator friendsTab;
-  private final Locator allPeopleTab;
-  private final Locator outcomeInvitationsTab;
-  private final Locator incomeInvitationsTab;
 
   public PeoplePage(Page page) {
     this.page = page;
     this.peopleTable = new PeopleTable(page);
-    this.friendsTab = page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("Friends").setExact(true));
-    this.allPeopleTab = page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("All People").setExact(true));
-    this.outcomeInvitationsTab = page.getByRole(
-        AriaRole.TAB,
-        new Page.GetByRoleOptions().setName("Outcome invitations").setExact(true)
+  }
+
+  @Step("Open tab: {tab}")
+  public PeoplePage openTab(PeopleTab tab) {
+    waitForGraphql(
+        tab.operation(),
+        () -> page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName(tab.label()).setExact(true)).click()
     );
-    this.incomeInvitationsTab = page.getByRole(
-        AriaRole.TAB,
-        new Page.GetByRoleOptions().setName("Income invitations").setExact(true)
-    );
-  }
-
-  @Step("Open friends tab")
-  public PeoplePage clickFriends() {
-    waitForGraphql("GetFriends", friendsTab::click);
-    return this;
-  }
-
-  @Step("Open all people tab")
-  public PeoplePage clickAllPeople() {
-    waitForGraphql("GetPeople", allPeopleTab::click);
-    return this;
-  }
-
-  @Step("Open outcome invitations tab")
-  public PeoplePage clickOutcomeInvitations() {
-    waitForGraphql("GetOutcomeInvitations", outcomeInvitationsTab::click);
-    return this;
-  }
-
-  @Step("Open income invitations tab")
-  public PeoplePage clickIncomeInvitations() {
-    waitForGraphql("GetInvitations", incomeInvitationsTab::click);
     return this;
   }
 
