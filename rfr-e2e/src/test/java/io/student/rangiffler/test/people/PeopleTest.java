@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Epic("Web")
 @Feature("People")
 @Story("Friendship preconditions")
-@Tag("web")
 class PeopleTest extends BaseWebTest {
 
   @Test

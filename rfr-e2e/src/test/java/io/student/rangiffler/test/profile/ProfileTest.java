@@ -20,7 +20,6 @@ import java.nio.file.Path;
 @Epic("Web")
 @Feature("Profile")
 @Story("Edit profile")
-@Tag("web")
 class ProfileTest extends BaseWebTest {
 
   private static final String FIRST_NAME = "Ivan";

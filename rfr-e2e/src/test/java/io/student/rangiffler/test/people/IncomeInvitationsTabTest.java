@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 @Epic("Web")
 @Feature("People")
 @Story("Income invitations")
-@Tag("web")
 class IncomeInvitationsTabTest extends BaseWebTest {
 
   @Test

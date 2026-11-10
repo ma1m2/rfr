@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 @Epic("Web")
 @Feature("Auth")
 @Story("Registration")
-@Tag("web")
 class RegistrationTest extends BaseWebTest {
 
   private UserFixture userFixture;
