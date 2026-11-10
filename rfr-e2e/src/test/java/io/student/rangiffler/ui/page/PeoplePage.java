@@ -22,7 +22,7 @@ public final class PeoplePage {
   public PeoplePage openTab(PeopleTab tab) {
     waitForGraphql(
         tab.operation(),
-        () -> page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName(tab.label()).setExact(true)).click()
+        () -> page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName(tab.label() + " broken").setExact(true)).click()
     );
     return this;
   }
