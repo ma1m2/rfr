@@ -3,26 +3,29 @@ package io.student.rangiffler.test.web;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import io.qameta.allure.playwright.AllurePlaywright;
+import io.student.rangiffler.config.TestConfig;
 import io.student.rangiffler.data.TestUser;
-import io.student.rangiffler.jupiter.annotation.WebTest;
+import io.student.rangiffler.jupiter.annotation.UiTest;
 import io.student.rangiffler.ui.page.LandingPage;
+import io.student.rangiffler.ui.page.MyTravelsPage;
 import io.student.rangiffler.ui.page.PeoplePage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
-@WebTest
+@UiTest
 public abstract class BaseWebTest {
 
   @BeforeAll
   static void setUp() {
-    PlaywrightAssertions.setDefaultAssertionTimeout(15_000);
+    PlaywrightAssertions.setDefaultAssertionTimeout(TestConfig.assertionTimeout());
   }
 
   @BeforeEach
   void preparePage(Page page) {
-    page.setDefaultTimeout(15_000);
-    page.setDefaultNavigationTimeout(15_000);
+    page.setDefaultTimeout(TestConfig.actionTimeout());//click, fill, locator.waitFor
+    page.setDefaultNavigationTimeout(TestConfig.navigateTimeout());
+    //navigate/goto, reload, goBack, goForward, waitForURL, waitForNavigation, setContent
   }
 
   @AfterEach
@@ -33,7 +36,14 @@ public abstract class BaseWebTest {
     AllurePlaywright.attachScreenshot("Last screenshot", page);
     AllurePlaywright.attachPageSource("Page source", page);
     AllurePlaywright.attachConsoleMessages("Browser console logs", page);
-    page.context().close();
+  }
+
+  protected final MyTravelsPage openMyTravels(Page page, TestUser user) {
+    return new LandingPage(page)
+        .open()
+        .clickLogin()
+        .fillLoginForm(user.username(), user.password())
+        .clickSignIn();
   }
 
   protected final PeoplePage openPeople(Page page, TestUser user) {

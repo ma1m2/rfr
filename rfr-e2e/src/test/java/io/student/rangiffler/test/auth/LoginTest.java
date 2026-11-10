@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 @Epic("Web")
 @Feature("Auth")
 @Story("Login")
-@Tag("web")
 class LoginTest extends BaseWebTest {
 
   @Test

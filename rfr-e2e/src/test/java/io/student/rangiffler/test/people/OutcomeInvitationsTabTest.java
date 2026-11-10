@@ -7,6 +7,7 @@ import io.qameta.allure.Story;
 import io.student.rangiffler.data.TestUser;
 import io.student.rangiffler.jupiter.annotation.User;
 import io.student.rangiffler.test.web.BaseWebTest;
+import io.student.rangiffler.ui.page.PeopleTab;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 @Epic("Web")
 @Feature("People")
 @Story("Outcome invitations")
-@Tag("web")
 class OutcomeInvitationsTabTest extends BaseWebTest {
 
   @Test
@@ -27,7 +27,7 @@ class OutcomeInvitationsTabTest extends BaseWebTest {
     TestUser inviter = user.incomeInvitations().getFirst();
     TestUser invitee = user.outcomeInvitations().getFirst();
     openPeople(page, user)
-        .clickOutcomeInvitations()
+        .openTab(PeopleTab.OUTCOME_INVITATIONS)
         .checkThatUsername(invitee.username())
         .checkThatInvitationWaiting(invitee.username())
         .checkThatCancel(invitee.username())
@@ -39,7 +39,7 @@ class OutcomeInvitationsTabTest extends BaseWebTest {
   @DisplayName("Outcome invitations tab is empty without invitations")
   void shouldShowEmptyOutcomeInvitations(@User TestUser user, Page page) {
     openPeople(page, user)
-        .clickOutcomeInvitations()
+        .openTab(PeopleTab.OUTCOME_INVITATIONS)
         .checkThatNoUsers("There are no users yet");
   }
 }

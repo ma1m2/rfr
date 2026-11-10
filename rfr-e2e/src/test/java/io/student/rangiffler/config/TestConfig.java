@@ -39,6 +39,26 @@ public final class TestConfig {
     return Boolean.parseBoolean(value("headless", "true"));
   }
 
+  public static int viewportWidth() {
+    return Integer.parseInt(value("viewportWidth", "1920"));
+  }
+
+  public static int viewportHeight() {
+    return Integer.parseInt(value("viewportHeight", "1080"));
+  }
+
+  public static int actionTimeout() {
+    return Integer.parseInt(value("actionTimeout", "5000"));
+  }
+
+  public static int navigateTimeout() {
+    return Integer.parseInt(value("navigateTimeout", "30000"));
+  }
+
+  public static int assertionTimeout() {
+    return Integer.parseInt(value("assertionTimeout", "5000"));
+  }
+
   public static boolean standCheck() {
     return Boolean.parseBoolean(value("standCheck", "true"));
   }

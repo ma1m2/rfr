@@ -95,6 +95,18 @@ tasks.register('installPlaywright', JavaExec) {
     args 'install', 'chromium'
 }
 
+tasks.register('showTrace', JavaExec) {
+    group = 'verification'
+    description = 'Opens a Playwright trace.zip in Trace Viewer'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.microsoft.playwright.CLI'
+    args 'show-trace'
+    def trace = findProperty('trace')
+    if (trace != null) {
+        args trace.toString()
+    }
+}
+
 tasks.register('installPlaywrightWithDeps', JavaExec) {
     group = 'verification'
     description = 'Downloads Playwright Chromium and OS libraries'

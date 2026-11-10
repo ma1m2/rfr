@@ -26,6 +26,8 @@ E2E-тесты Rangiffler: JUnit 6.1.3, Playwright Java 1.63 (`@UsePlaywright`),
 | `rfr.dbUrl` | `jdbc:mysql://localhost:3306` (схема добавляется кодом) |
 | `rfr.dbUser` / `rfr.dbPassword` | `root` / `secret` |
 | `rfr.browser` / `rfr.headless` | `chromium` / `true` |
+| `rfr.viewportWidth` / `rfr.viewportHeight` | `1920` / `1080` |
+| `rfr.actionTimeout` / `rfr.navigateTimeout` / `rfr.assertionTimeout` | `5000` / `30000` / `5000` (мс) |
 
 ## Архитектура
 
