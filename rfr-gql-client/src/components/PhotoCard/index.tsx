@@ -95,9 +95,10 @@ export const PhotoCard: FC<PhotoCardInterface> = ({photo, onEditClick}) => {
                     alt={photo.description || photo.country.name}
                 />
                 <Chip
+                    id={countryId}
                     size="small"
                     avatar={<Avatar src={photo.country.flag} alt=""/>}
-                    label={<span id={countryId}>{photo.country.name}</span>}
+                    label={photo.country.name}
                     sx={{
                         position: "absolute",
                         left: 12,

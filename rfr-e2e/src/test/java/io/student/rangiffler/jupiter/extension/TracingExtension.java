@@ -1,6 +1,5 @@
 package io.student.rangiffler.jupiter.extension;
 
-import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Tracing;
 import com.microsoft.playwright.impl.junit.BrowserContextExtension;
 import io.qameta.allure.Allure;
@@ -12,29 +11,19 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Playwright context tracing for UI tests, attached to Allure only on failure.
- */
 public final class TracingExtension implements BeforeEachCallback, AfterEachCallback {
   @Override
   public void beforeEach(ExtensionContext context) {
-    if (!hasPage(context)) {
-      return;
-    }
     BrowserContextExtension.getOrCreateBrowserContext(context).tracing().start(
-        new Tracing.StartOptions().setScreenshots(true).setSnapshots(true)
+        new Tracing.StartOptions().setScreenshots(true).setSnapshots(true).setSources(true)
     );
   }
 
   @Override
   public void afterEach(ExtensionContext context) {
-    if (!hasPage(context)) {
-      return;
-    }
     if (context.getExecutionException().isEmpty()) {
       BrowserContextExtension.getOrCreateBrowserContext(context).tracing().stop();
       return;
@@ -59,17 +48,5 @@ public final class TracingExtension implements BeforeEachCallback, AfterEachCall
     } catch (IOException exception) {
       throw new UncheckedIOException("Cannot save Playwright trace in " + zip, exception);
     }
-  }
-
-  private boolean hasPage(ExtensionContext context) {
-    if (context.getTestMethod().isEmpty()) {
-      return false;
-    }
-    for (Parameter parameter : context.getRequiredTestMethod().getParameters()) {
-      if (parameter.getType() == Page.class) {
-        return true;
-      }
-    }
-    return false;
   }
 }
