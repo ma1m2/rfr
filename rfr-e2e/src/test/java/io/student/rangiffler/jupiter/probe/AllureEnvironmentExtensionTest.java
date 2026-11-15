@@ -51,6 +51,23 @@ class AllureEnvironmentExtensionTest {
   }
 
   @Test
+  @DisplayName("класс без тега UI-тестов — environment.properties не пишется")
+  void shouldSkipEnvironmentWhenClassHasNoUiTag() throws IOException {
+    Path directory = Files.createTempDirectory("allure-without-ui");
+    String previousDirectory = System.getProperty("allure.results.directory");
+    System.setProperty("allure.results.directory", directory.toString());
+    try {
+      execute(Plain.class);
+      assertFalse(
+          Files.exists(directory.resolve("environment.properties")),
+          "environment.properties was written for a class without ui"
+      );
+    } finally {
+      this.restore("allure.results.directory", previousDirectory);
+    }
+  }
+
+  @Test
   @DisplayName("afterSuite пишет файл, если beforeSuite более позднего extension упал")
   void shouldWriteEnvironmentWhenLaterBeforeSuiteFails() throws IOException {
     Path directory = Files.createTempDirectory("allure-after-failure");
@@ -109,6 +126,7 @@ class AllureEnvironmentExtensionTest {
   }
 
   @ProbeTarget
+  @Tag("ui")
   @ExtendWith(AllureEnvironmentExtension.class)
   static final class Observed {
     @Test
@@ -117,6 +135,15 @@ class AllureEnvironmentExtensionTest {
   }
 
   @ProbeTarget
+  @ExtendWith(AllureEnvironmentExtension.class)
+  static final class Plain {
+    @Test
+    void run() {
+    }
+  }
+
+  @ProbeTarget
+  @Tag("ui")
   @ExtendWith({AllureEnvironmentExtension.class, BrokenSchema.class})
   static final class AllureThenBroken {
     @Test

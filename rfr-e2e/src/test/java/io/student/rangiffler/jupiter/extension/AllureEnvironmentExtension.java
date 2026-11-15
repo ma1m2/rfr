@@ -15,6 +15,14 @@ import java.util.Map;
 
 public final class AllureEnvironmentExtension implements SuiteExtension {
   @Override
+  public void beforeAll(ExtensionContext context) {
+    if (!context.getTags().contains("ui")) {
+      return;
+    }
+    SuiteExtension.super.beforeAll(context);
+  }
+
+  @Override
   public void afterSuite(ExtensionContext context) {
     Path directory = Path.of(System.getProperty("allure.results.directory", "build/allure-results"));
     Map<String, String> environment = new LinkedHashMap<>();
