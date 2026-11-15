@@ -63,6 +63,10 @@ public final class TestConfig {
     return Boolean.parseBoolean(value("standCheck", "true"));
   }
 
+  public static boolean schemaCheck() {
+    return Boolean.parseBoolean(value("schemaCheck", "true"));
+  }
+
   public static long standTimeout() {
     return Long.parseLong(value("standTimeout", "180"));
   }

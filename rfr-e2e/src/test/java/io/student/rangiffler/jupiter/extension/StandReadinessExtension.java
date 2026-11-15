@@ -75,13 +75,13 @@ public final class StandReadinessExtension implements SuiteExtension {
       if (!this.mysql()) {
         down.add("mysql; start it with docker compose up -d --wait");
       }
-      if (!this.http(client, TestConfig.authUrl())) {
+      if (!this.http(client, this.uri(TestConfig.authUrl(), "/.well-known/openid-configuration"), "GET", null)) {
         down.add("rfr-auth; start it with ./gradlew runAll");
       }
-      if (!this.http(client, TestConfig.apiUrl())) {
+      if (!this.http(client, this.uri(TestConfig.apiUrl(), "/graphql"), "POST", "{\"query\":\"{__typename}\"}")) {
         down.add("rfr-api; start it with ./gradlew runAll");
       }
-      if (!this.http(client, TestConfig.frontUrl())) {
+      if (!this.http(client, this.uri(TestConfig.frontUrl(), "/"), "GET", null)) {
         down.add("rfr-gql-client; start it with npm run dev");
       }
       return down;
@@ -104,9 +104,13 @@ public final class StandReadinessExtension implements SuiteExtension {
       }
     }
 
-    private boolean http(HttpClient client, String url) {
-      for (URI target : this.targets(URI.create(url))) {
-        if (this.send(client, target)) {
+    private URI uri(String origin, String path) {
+      return URI.create(origin + "/").resolve(path.startsWith("/") ? path.substring(1) : path);
+    }
+
+    private boolean http(HttpClient client, URI origin, String method, String body) {
+      for (URI target : this.targets(origin)) {
+        if (this.send(client, target, method, body)) {
           return true;
         }
       }
@@ -148,13 +152,17 @@ public final class StandReadinessExtension implements SuiteExtension {
       return URI.create(origin.getScheme() + "://" + host + (port < 0 ? "" : ":" + port) + path + query);
     }
 
-    private boolean send(HttpClient client, URI target) {
+    private boolean send(HttpClient client, URI target, String method, String body) {
       try {
-        client.send(
-            HttpRequest.newBuilder(target).timeout(REQUEST).GET().build(),
-            HttpResponse.BodyHandlers.discarding()
-        );
-        return true;
+        HttpRequest.Builder request = HttpRequest.newBuilder(target).timeout(REQUEST);
+        if (body == null) {
+          request.method(method, HttpRequest.BodyPublishers.noBody());
+        } else {
+          request.header("Content-Type", "application/json")
+              .method(method, HttpRequest.BodyPublishers.ofString(body));
+        }
+        int status = client.send(request.build(), HttpResponse.BodyHandlers.discarding()).statusCode();
+        return status >= 200 && status < 300;
       } catch (IOException | InterruptedException exception) {
         if (exception instanceof InterruptedException) {
           Thread.currentThread().interrupt();

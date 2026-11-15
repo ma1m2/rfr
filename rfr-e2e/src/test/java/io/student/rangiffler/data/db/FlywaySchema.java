@@ -1,84 +1,71 @@
 package io.student.rangiffler.data.db;
 
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
+import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.api.output.ValidateResult;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.BadSqlGrammarException;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 public final class FlywaySchema implements Schema {
-  private final Databases database;
+  private final DataSource dataSource;
   private final String schema;
+  private final String location;
 
   public FlywaySchema(Databases database, String schema) {
-    this.database = database;
+    this(database.dataSource(), schema, "classpath:db/migration/" + schema);
+  }
+
+  public FlywaySchema(DataSource dataSource, String schema, String location) {
+    this.dataSource = dataSource;
     this.schema = schema;
+    this.location = location;
   }
 
   @Override
   public void verify() {
-    Set<String> scripts = new TreeSet<>(this.scripts());
-    if (scripts.isEmpty()) {
+    if (this.location.startsWith("classpath:") && this.scripts().isEmpty()) {
       throw new IllegalStateException(
           "Backend Flyway scripts for " + this.schema
               + " were not found on the classpath; run e2e through Gradle so migrations are copied from the backend"
       );
     }
-    Set<String> history = new TreeSet<>(this.history());
-    history.remove("0");
-    if (history.equals(scripts)) {
+    ValidateResult result = this.flyway().validateWithResult();
+    if (result.validationSuccessful) {
       return;
     }
-    Set<String> pending = new TreeSet<>(scripts);
-    pending.removeAll(history);
-    Set<String> extra = new TreeSet<>(history);
-    extra.removeAll(scripts);
     throw new IllegalStateException(
-        "Flyway versions in local " + this.schema + " " + history
-            + " do not match backend migrations " + scripts
+        "Flyway validation failed for " + this.schema + ": "
+            + String.join("; ", result.getAllErrorMessages())
             + "; restart the backend for " + this.schema
-            + " so Flyway applies " + pending
-            + " or recreate MySQL volume mysql-volume if this branch is older and extra versions are " + extra
+            + " so Flyway applies pending migrations or recreate MySQL volume mysql-volume if checksums differ"
     );
   }
 
   @Override
   public String version() {
     try {
-      TreeSet<String> history = new TreeSet<>(this.history());
-      history.remove("0");
-      if (history.isEmpty()) {
+      MigrationInfo current = this.flyway().info().current();
+      if (current == null || current.getVersion() == null) {
         return "0";
       }
-      return history.last();
-    } catch (IllegalStateException exception) {
+      return current.getVersion().toString();
+    } catch (FlywayException exception) {
       return "unavailable";
     }
   }
 
-  private List<String> history() {
-    try {
-      return Jdbc.client(this.database)
-          .sql(Jdbc.sql("sql/flyway/select-versions.sql"))
-          .query((rs, rowNum) -> rs.getString("version"))
-          .list();
-    } catch (BadSqlGrammarException exception) {
-      throw new IllegalStateException(
-          "Flyway history table is missing in " + this.schema + "; start the backend for " + this.schema + " so Flyway migrates",
-          exception
-      );
-    } catch (DataAccessException exception) {
-      throw new IllegalStateException(
-          "Cannot read Flyway history in " + this.schema + "; start MySQL on port 3306",
-          exception
-      );
-    }
+  private Flyway flyway() {
+    return Flyway.configure()
+        .dataSource(this.dataSource)
+        .locations(this.location)
+        .load();
   }
 
   private List<String> scripts() {
