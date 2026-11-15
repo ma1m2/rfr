@@ -1,5 +1,6 @@
 package io.student.rangiffler.jupiter.probe;
 
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import io.student.rangiffler.jupiter.extension.StandReadinessExtension;
 import org.junit.jupiter.api.DisplayName;
@@ -80,6 +81,30 @@ class StandReadinessExtensionTest {
   }
 
   @Test
+  @DisplayName("OIDC и GraphQL отвечают 503 — тесты не выполняются")
+  void shouldSkipTestsWhenReadyEndpointsReturnErrors() throws Exception {
+    AtomicInteger hits = new AtomicInteger();
+    HttpServer http = this.http(hits, 200, 503, 503);
+    http.start();
+    try (ServerSocket mysql = mysql()) {
+      Properties previous = pointTo(http, mysql, "2", null);
+      try {
+        EngineExecutionResults results = execute(WaitingUi.class);
+        assertEquals(0L, results.testEvents().started().count(), "Tests ran while OIDC and GraphQL returned errors");
+        String message = failure(results);
+        assertTrue(
+            message.contains("rfr-auth") || message.contains("rfr-api"),
+            "Timeout error did not name rfr-auth or rfr-api: " + message
+        );
+      } finally {
+        restore(previous);
+      }
+    } finally {
+      http.stop(0);
+    }
+  }
+
+  @Test
   @DisplayName("класс без тега UI-тестов — к сервису нет ни одного запроса")
   void shouldSkipStandWhenClassHasNoUiTag() throws Exception {
     AtomicInteger hits = new AtomicInteger();
@@ -135,13 +160,22 @@ class StandReadinessExtensionTest {
   }
 
   private HttpServer http(AtomicInteger hits) throws IOException {
+    return this.http(hits, 200, 200, 200);
+  }
+
+  private HttpServer http(AtomicInteger hits, int root, int oidc, int graphql) throws IOException {
     HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-    server.createContext("/", exchange -> {
-      hits.incrementAndGet();
-      exchange.sendResponseHeaders(200, 0);
-      exchange.close();
-    });
+    server.createContext("/", exchange -> this.reply(hits, exchange, root));
+    server.createContext("/.well-known/openid-configuration", exchange -> this.reply(hits, exchange, oidc));
+    server.createContext("/graphql", exchange -> this.reply(hits, exchange, graphql));
     return server;
+  }
+
+  private void reply(AtomicInteger hits, HttpExchange exchange, int status) throws IOException {
+    hits.incrementAndGet();
+    exchange.getRequestBody().readAllBytes();
+    exchange.sendResponseHeaders(status, 0);
+    exchange.close();
   }
 
   private ServerSocket mysql() throws IOException {
